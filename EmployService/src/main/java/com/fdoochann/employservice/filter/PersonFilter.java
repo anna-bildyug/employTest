@@ -22,6 +22,7 @@ public class PersonFilter
 			{
 				filteredPerson = person;
 			}
+			i++;
 		}
 		return filteredPerson;
 	}

@@ -3,6 +3,7 @@ package com.fdoochann.employservice.controller;
 import com.fdoochann.employservice.Application;
 import com.fdoochann.employservice.model.Person;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

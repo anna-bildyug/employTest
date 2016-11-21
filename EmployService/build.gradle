@@ -19,6 +19,9 @@ jar {
 
 repositories {
     mavenCentral()
+    flatDir {
+        dirs 'lib'
+    }
 }
 
 sourceCompatibility = 1.8
@@ -26,5 +29,10 @@ targetCompatibility = 1.8
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+//    compile("com.h2database:h2")
+//    compile name: 'sqljdbc4'
+    compile files('lib/sqljdbc4.jar')
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

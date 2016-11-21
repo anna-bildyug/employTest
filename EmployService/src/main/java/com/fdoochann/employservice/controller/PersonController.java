@@ -6,26 +6,30 @@ import java.util.List;
 import com.fdoochann.employservice.filter.PersonFilter;
 import com.fdoochann.employservice.exceptions.ResourceNotFoundException;
 import com.fdoochann.employservice.model.Person;
+import com.fdoochann.employservice.repository.PersonRepository;
+import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class PersonController
 {
-	private List<Person> persons = new ArrayList();
 	@Autowired
 	private PersonFilter personFilter;
+	@Autowired
+	private PersonRepository personRepository;
 
 	@RequestMapping(value = "/persons", method = RequestMethod.GET)
 	public List<Person> get()
 	{
-		return persons;
+		Iterable<Person> persons = personRepository.findAll();
+		return IteratorUtils.toList(persons.iterator());
 	}
 
 	@RequestMapping(value = "/persons/{id}", method = RequestMethod.GET)
 	public Person get(@PathVariable("id") long id)
 	{
-		Person filteredPerson = personFilter.getPersonById(persons, id);
+		Person filteredPerson = personRepository.findOne(id);
 		if (filteredPerson == null)
 		{
 			throw new ResourceNotFoundException(id);
@@ -36,15 +40,13 @@ public class PersonController
 	@RequestMapping(value = "/persons", method = RequestMethod.POST)
 	public Person post(@RequestBody Person person)
 	{
-		persons.remove(person);
-		persons.add(person);
-		return person;
+		return personRepository.save(person);
 	}
 
-	@RequestMapping(value = "/persons", method = RequestMethod.DELETE)
-	public void delete(@RequestBody Person person)
+	@RequestMapping(value = "/persons/{id}", method = RequestMethod.DELETE)
+	public void delete(@PathVariable long id)
 	{
-		persons.remove(person);
+		personRepository.delete(id);
 	}
 
 }

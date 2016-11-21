@@ -1,13 +1,20 @@
 package com.fdoochann.employservice.model;
 
+import javax.persistence.*;
+
 /**
  * Created by Anna_Bildyug on 11/21/2016.
  */
+@Entity
+@Table(name = "Persons")
 public class Person
 {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
+
 	private String firstName;
-	private String lastname;
+	private String lastName;
 	private int age;
 	private boolean isHired;
 
@@ -23,12 +30,12 @@ public class Person
 
 	public String getLastname()
 	{
-		return lastname;
+		return lastName;
 	}
 
-	public void setLastname(String lastname)
+	public void setLastname(String lastName)
 	{
-		this.lastname = lastname;
+		this.lastName = lastName;
 	}
 
 	public int getAge()

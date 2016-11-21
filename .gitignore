@@ -1,0 +1,4 @@
+.idea
+.settings
+EmployService/build/*
+EmployService/.gradle/*

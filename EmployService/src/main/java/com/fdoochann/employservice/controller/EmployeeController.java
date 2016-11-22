@@ -5,6 +5,7 @@ import com.fdoochann.employservice.exceptions.ResourceNotFoundException;
 import com.fdoochann.employservice.model.Employee;
 import com.fdoochann.employservice.repository.EmployeeRepository;
 import com.fdoochann.employservice.transformer.EmployeeTransformer;
+import com.fdoochann.employservice.validation.EmployeeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,8 @@ public class EmployeeController
 	private EmployeeRepository employeeRepository;
 	@Autowired
 	private EmployeeTransformer employeeTransformer;
+	@Autowired
+	private EmployeeValidator employeeValidator;
 
 	@RequestMapping(value = "/employees", method = RequestMethod.GET)
 	public List<EmployeeBindingModel> get()
@@ -52,6 +55,7 @@ public class EmployeeController
 	public EmployeeBindingModel post(@RequestBody EmployeeBindingModel employee)
 	{
 		Employee model = employeeTransformer.transform(employee);
+		employeeValidator.validate(model);
 		Employee storedModel = employeeRepository.save(model);
 		EmployeeBindingModel bindingModel = employeeTransformer.transform(storedModel);
 		return bindingModel;

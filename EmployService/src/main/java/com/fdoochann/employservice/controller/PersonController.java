@@ -3,6 +3,7 @@ package com.fdoochann.employservice.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fdoochann.employservice.exceptions.BadRequestException;
 import com.fdoochann.employservice.filter.PersonFilter;
 import com.fdoochann.employservice.exceptions.ResourceNotFoundException;
 import com.fdoochann.employservice.model.Person;
@@ -38,6 +39,18 @@ public class PersonController
 	@RequestMapping(value = "/persons", method = RequestMethod.POST)
 	public Person post(@RequestBody Person person)
 	{
+		person.setId(null);
+		return personRepository.save(person);
+	}
+
+	@RequestMapping(value = "/persons", method = RequestMethod.PUT)
+	public Person put(@RequestBody Person person)
+	{
+		Long id = person.getId();
+		if (id == null || !personRepository.exists(id))
+		{
+			throw new BadRequestException("Incorrect id for person "+id);
+		}
 		return personRepository.save(person);
 	}
 

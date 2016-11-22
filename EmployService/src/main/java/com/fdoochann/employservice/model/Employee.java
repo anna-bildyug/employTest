@@ -12,11 +12,11 @@ public class Employee
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "id")
+	@OneToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name = "person_id")
 	private Person person;
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "id")
+	@OneToOne(cascade = CascadeType.DETACH)
+	@JoinColumn(name = "company_id")
 	private Company company;
 
 	public Long getId()
@@ -48,5 +48,4 @@ public class Employee
 	{
 		this.company = company;
 	}
-
 }

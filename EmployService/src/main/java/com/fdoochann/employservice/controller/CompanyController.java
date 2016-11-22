@@ -2,7 +2,6 @@ package com.fdoochann.employservice.controller;
 
 import com.fdoochann.employservice.exceptions.ResourceNotFoundException;
 import com.fdoochann.employservice.model.Company;
-import com.fdoochann.employservice.model.Employee;
 import com.fdoochann.employservice.repository.CompanyRepository;
 import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.beans.factory.annotation.Autowired;

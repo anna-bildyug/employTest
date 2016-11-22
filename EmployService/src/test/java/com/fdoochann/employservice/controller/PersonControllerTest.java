@@ -21,9 +21,12 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -48,8 +51,8 @@ public class PersonControllerTest
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
-
-
+	@PersistenceContext
+	private EntityManager entityManager;
 	@Autowired
 	void setConverters(HttpMessageConverter<?>[] converters)
 	{
@@ -100,9 +103,14 @@ public class PersonControllerTest
 				.andExpect(jsonPath("$.lastName", is("lastName")))
 				.andExpect(jsonPath("$.age", is(50)));
 
-		mockMvc.perform(get("/persons"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$", hasSize(3)));
+		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
+		assertEquals(3, persons.size());
+
+		Person storedPerson = entityManager.find(Person.class, 2L);
+		assertNotNull(storedPerson);
+		assertEquals("firstName", storedPerson.getFirstName());
+		assertEquals("lastName", storedPerson.getLastName());
+		assertEquals(50, storedPerson.getAge());
 	}
 
 	@Test
@@ -121,9 +129,28 @@ public class PersonControllerTest
 				.andExpect(jsonPath("$.lastName", is("lastName")))
 				.andExpect(jsonPath("$.age", is(50)));
 
+		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
+		assertEquals(2, persons.size());
+
+		Person storedPerson = entityManager.find(Person.class, 0L);
+		assertNotNull(storedPerson);
+		assertEquals("firstName", storedPerson.getFirstName());
+		assertEquals("lastName", storedPerson.getLastName());
+		assertEquals(50, storedPerson.getAge());
+	}
+
+	@Test
+	public void deleteExistedPersonWithoutLinks() throws Exception
+	{
+		mockMvc.perform(delete("/persons/"+1)).andExpect(status().isOk());
+
 		mockMvc.perform(get("/persons"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$", hasSize(2)));
+				.andExpect(jsonPath("$", hasSize(1)));
+
+		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
+		assertEquals(1, persons.size());
+
 	}
 
 	protected String json(Object o) throws IOException

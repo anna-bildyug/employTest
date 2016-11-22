@@ -1,13 +1,14 @@
 package com.fdoochann.employservice.controller;
 
+import com.fdoochann.employservice.bindingmodel.EmployeeBindingModel;
 import com.fdoochann.employservice.exceptions.ResourceNotFoundException;
 import com.fdoochann.employservice.model.Employee;
-import com.fdoochann.employservice.model.Person;
 import com.fdoochann.employservice.repository.EmployeeRepository;
-import org.apache.commons.collections4.IteratorUtils;
+import com.fdoochann.employservice.transformer.EmployeeTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,29 +19,42 @@ public class EmployeeController
 {
 	@Autowired
 	private EmployeeRepository employeeRepository;
+	@Autowired
+	private EmployeeTransformer employeeTransformer;
 
 	@RequestMapping(value = "/employees", method = RequestMethod.GET)
-	public List<Employee> get()
+	public List<EmployeeBindingModel> get()
 	{
-		Iterable<Employee> employees = employeeRepository.findAll();
-		return IteratorUtils.toList(employees.iterator());
+		Iterable<Employee> storedEmployees = employeeRepository.findAll();
+
+		List<EmployeeBindingModel>  employees = new ArrayList<>();
+		storedEmployees.forEach(employee ->
+		{
+			employees.add(employeeTransformer.transform(employee));
+		});
+
+		return employees;
 	}
 
 	@RequestMapping(value = "/employees/{id}", method = RequestMethod.GET)
-	public Employee get(@PathVariable("id") long id)
+	public EmployeeBindingModel get(@PathVariable("id") long id)
 	{
-		Employee filteredEmployee = employeeRepository.findOne(id);
-		if (filteredEmployee == null)
+		Employee storedEmployee = employeeRepository.findOne(id);
+
+		if (storedEmployee == null)
 		{
 			throw new ResourceNotFoundException(id);
 		}
-		return filteredEmployee;
+		return employeeTransformer.transform(storedEmployee);
 	}
 
 	@RequestMapping(value = "/employees", method = RequestMethod.POST)
-	public Employee post(@RequestBody Employee employee)
+	public EmployeeBindingModel post(@RequestBody EmployeeBindingModel employee)
 	{
-		return employeeRepository.save(employee);
+		Employee model = employeeTransformer.transform(employee);
+		Employee storedModel = employeeRepository.save(model);
+		EmployeeBindingModel bindingModel = employeeTransformer.transform(storedModel);
+		return bindingModel;
 	}
 
 	@RequestMapping(value = "/employees/{id}", method = RequestMethod.DELETE)

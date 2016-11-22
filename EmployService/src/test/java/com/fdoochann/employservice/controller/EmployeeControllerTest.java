@@ -17,6 +17,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -47,8 +49,8 @@ public class EmployeeControllerTest
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
-
-
+	@PersistenceContext
+	private EntityManager entityManager;
 	@Autowired
 	void setConverters(HttpMessageConverter<?>[] converters)
 	{

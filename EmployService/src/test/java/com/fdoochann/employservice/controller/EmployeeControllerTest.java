@@ -2,20 +2,16 @@ package com.fdoochann.employservice.controller;
 
 import com.fdoochann.employservice.Application;
 import com.fdoochann.employservice.model.Person;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,11 +21,14 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-import static org.hamcrest.Matchers.*;
 
 /**
  * Created by Anna_Bildyug on 11/21/2016.
@@ -38,7 +37,7 @@ import static org.hamcrest.Matchers.*;
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class PersonControllerTest
+public class EmployeeControllerTest
 {
 	private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
 
@@ -66,64 +65,30 @@ public class PersonControllerTest
 	@Test
 	public void getAllTest() throws Exception
 	{
-		mockMvc.perform(get("/persons"))
+		mockMvc.perform(get("/employees"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$", hasSize(2)))
+				.andExpect(jsonPath("$", hasSize(1)))
 				.andExpect(jsonPath("$[0].id", is(0)))
-				.andExpect(jsonPath("$[0].firstName", is("John")))
-				.andExpect(jsonPath("$[0].lastName", is("Doe")))
-				.andExpect(jsonPath("$[0].age", is(50)))
-				.andExpect(jsonPath("$[1].id", is(1)))
-				.andExpect(jsonPath("$[1].firstName", is("Tom")))
-				.andExpect(jsonPath("$[1].lastName", is("Smith")))
-				.andExpect(jsonPath("$[1].age", is(30)));
+				.andExpect(jsonPath("$[0].person.id", is(0)))
+				.andExpect(jsonPath("$[0].company.id", is(0)));
 	}
 
 	@Test
 	public void personNotFoundTest() throws Exception
 	{
-		mockMvc.perform(get("/persons/5")).andExpect(status().isNotFound());
+		mockMvc.perform(get("/employees/5")).andExpect(status().isNotFound());
 	}
 
 	@Test
-	public void addPerson() throws Exception
+	public void addEmployee() throws Exception
 	{
-		Person person = new Person();
-		person.setAge(50);
-		person.setLastName("lastName");
-		person.setFirstName("firstName");
 
-		mockMvc.perform(post("/persons").content(this.json(person)).contentType(contentType))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(2)))
-				.andExpect(jsonPath("$.firstName", is("firstName")))
-				.andExpect(jsonPath("$.lastName", is("lastName")))
-				.andExpect(jsonPath("$.age", is(50)));
-
-		mockMvc.perform(get("/persons"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$", hasSize(3)));
 	}
 
 	@Test
-	public void updatePerson() throws Exception
+	public void updateEmployee() throws Exception
 	{
-		Person person = new Person();
-		person.setId(0L);
-		person.setAge(50);
-		person.setLastName("lastName");
-		person.setFirstName("firstName");
 
-		mockMvc.perform(post("/persons").content(this.json(person)).contentType(contentType))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(0)))
-				.andExpect(jsonPath("$.firstName", is("firstName")))
-				.andExpect(jsonPath("$.lastName", is("lastName")))
-				.andExpect(jsonPath("$.age", is(50)));
-
-		mockMvc.perform(get("/persons"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$", hasSize(2)));
 	}
 
 	protected String json(Object o) throws IOException

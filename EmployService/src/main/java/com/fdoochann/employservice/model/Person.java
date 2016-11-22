@@ -11,12 +11,11 @@ public class Person
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
-
+	@Column(name = "id")
+	private Long id;
 	private String firstName;
 	private String lastName;
 	private int age;
-	private boolean isHired;
 
 	public String getFirstName()
 	{
@@ -28,12 +27,12 @@ public class Person
 		this.firstName = firstName;
 	}
 
-	public String getLastname()
+	public String getLastName()
 	{
 		return lastName;
 	}
 
-	public void setLastname(String lastName)
+	public void setLastName(String lastName)
 	{
 		this.lastName = lastName;
 	}
@@ -48,22 +47,12 @@ public class Person
 		this.age = age;
 	}
 
-	public boolean isHired()
-	{
-		return isHired;
-	}
-
-	public void setHired(boolean hired)
-	{
-		isHired = hired;
-	}
-
-	public long getId()
+	public Long getId()
 	{
 		return id;
 	}
 
-	public void setId(long id)
+	public void setId(Long id)
 	{
 		this.id = id;
 	}

@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class PersonController
 {
 	@Autowired
-	private PersonFilter personFilter;
-	@Autowired
 	private PersonRepository personRepository;
 
 	@RequestMapping(value = "/persons", method = RequestMethod.GET)

@@ -72,11 +72,11 @@ public class PersonControllerTest
 		mockMvc.perform(get("/persons"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(2)))
-				.andExpect(jsonPath("$[0].id", is(0)))
+				.andExpect(jsonPath("$[0].id", is(1)))
 				.andExpect(jsonPath("$[0].firstName", is("John")))
 				.andExpect(jsonPath("$[0].lastName", is("Doe")))
 				.andExpect(jsonPath("$[0].age", is(50)))
-				.andExpect(jsonPath("$[1].id", is(1)))
+				.andExpect(jsonPath("$[1].id", is(2)))
 				.andExpect(jsonPath("$[1].firstName", is("Tom")))
 				.andExpect(jsonPath("$[1].lastName", is("Smith")))
 				.andExpect(jsonPath("$[1].age", is(30)));
@@ -98,7 +98,7 @@ public class PersonControllerTest
 
 		mockMvc.perform(post("/persons").content(this.json(person)).contentType(contentType))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(2)))
+				.andExpect(jsonPath("$.id", is(3)))
 				.andExpect(jsonPath("$.firstName", is("firstName")))
 				.andExpect(jsonPath("$.lastName", is("lastName")))
 				.andExpect(jsonPath("$.age", is(50)));
@@ -106,7 +106,7 @@ public class PersonControllerTest
 		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
 		assertEquals(3, persons.size());
 
-		Person storedPerson = entityManager.find(Person.class, 2L);
+		Person storedPerson = entityManager.find(Person.class, 3L);
 		assertNotNull(storedPerson);
 		assertEquals("firstName", storedPerson.getFirstName());
 		assertEquals("lastName", storedPerson.getLastName());
@@ -117,14 +117,14 @@ public class PersonControllerTest
 	public void updatePerson() throws Exception
 	{
 		Person person = new Person();
-		person.setId(0L);
+		person.setId(1L);
 		person.setAge(50);
 		person.setLastName("lastName");
 		person.setFirstName("firstName");
 
 		mockMvc.perform(post("/persons").content(this.json(person)).contentType(contentType))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(0)))
+				.andExpect(jsonPath("$.id", is(1)))
 				.andExpect(jsonPath("$.firstName", is("firstName")))
 				.andExpect(jsonPath("$.lastName", is("lastName")))
 				.andExpect(jsonPath("$.age", is(50)));
@@ -132,7 +132,7 @@ public class PersonControllerTest
 		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
 		assertEquals(2, persons.size());
 
-		Person storedPerson = entityManager.find(Person.class, 0L);
+		Person storedPerson = entityManager.find(Person.class, 1L);
 		assertNotNull(storedPerson);
 		assertEquals("firstName", storedPerson.getFirstName());
 		assertEquals("lastName", storedPerson.getLastName());

@@ -26,37 +26,30 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
-@DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class EmployeeRepositoryTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+public class EmployeeRepositoryTest
+{
+	@PersistenceContext
+	private EntityManager entityManager;
+	@Autowired
+	private EmployeeRepository employeeRepository;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+	@Test
+	public void createEmployee()
+	{
+		Company company = new Company();
+		company.setId(1L);
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+		Person person = new Person();
+		person.setId(1L);
 
-    @Test
-    public void createEmployee()
-    {
-//        Company company = new Company();
-//        company.setId(1L);
-//
-//        Person person = new Person();
-//        person.setId(1L);
-//        person.setFirstName("Billy");
+		Employee employee = new Employee();
+		employee.setCompany(company);
+		employee.setPerson(person);
 
-        Employee employee = new Employee();
-        employee.setCompany(entityManager.getReference(Company.class, 1L));
-        employee.setPerson(entityManager.getReference(Person.class, 1L));
-//
-//        employee.setCompany(company);
-//        employee.setPerson(person);
-
-        Employee savedEmployee = employeeRepository.save(employee);
-
-//        List employees = entityManager.createQuery("SELECT e FROM Employee e").getResultList();
-//        Employee employeeFromDB = entityManager.find(Employee.class, savedEmployee.getId());
-//        assertEquals(Long.valueOf(0), employees.get(1).getCompany().getId());
-//        assertEquals(Long.valueOf(0), employees.get(1).getPerson().getId());
-    }
+		Employee savedEmployee = employeeRepository.save(employee);
+		Employee employeeFromDB = entityManager.find(Employee.class, savedEmployee.getId());
+		assertEquals(Long.valueOf(1), employeeFromDB.getCompany().getId());
+		assertEquals(Long.valueOf(1), employeeFromDB.getPerson().getId());
+	}
 }

@@ -12,10 +12,12 @@ public class Employee
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	@OneToOne(cascade = CascadeType.DETACH)
+
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "person_id")
 	private Person person;
-	@OneToOne(cascade = CascadeType.DETACH)
+
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "company_id")
 	private Company company;
 

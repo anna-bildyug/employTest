@@ -12,6 +12,6 @@ CREATE TABLE Companies (
 
 CREATE TABLE Employees (
   id         INTEGER AUTO_INCREMENT PRIMARY KEY,
-  personId INTEGER REFERENCES Persons (id),
-  companyId INTEGER REFERENCES Companies (id)
+  person_id INTEGER REFERENCES Persons (id),
+  company_id INTEGER REFERENCES Companies (id)
 );

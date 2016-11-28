@@ -49,8 +49,7 @@ public class EmployeeControllerTest
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
-	@PersistenceContext
-	private EntityManager entityManager;
+
 	@Autowired
 	void setConverters(HttpMessageConverter<?>[] converters)
 	{

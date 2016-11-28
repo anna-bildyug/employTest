@@ -3,4 +3,4 @@ INSERT INTO Persons(id, first_name, last_name, age) VALUES (1, 'Tom', 'Smith', 3
 
 INSERT INTO Companies(id, name) VALUES (0, 'Home');
 
-INSERT INTO Employees(id, personId, companyId) VALUES (0, 0, 0);
+INSERT INTO Employees(id, person_id, company_id) VALUES (0, 0, 0);

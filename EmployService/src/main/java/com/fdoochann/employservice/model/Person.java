@@ -13,9 +13,15 @@ public class Person
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Long id;
+
 	private String firstName;
+
 	private String lastName;
+
 	private int age;
+
+	@OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
+	private Employee employee;
 
 	public String getFirstName()
 	{
@@ -55,5 +61,13 @@ public class Person
 	public void setId(Long id)
 	{
 		this.id = id;
+	}
+
+	public Employee getEmployee() {
+		return employee;
+	}
+
+	public void setEmployee(Employee employee) {
+		this.employee = employee;
 	}
 }

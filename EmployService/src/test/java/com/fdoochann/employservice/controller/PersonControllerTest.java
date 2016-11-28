@@ -1,6 +1,8 @@
 package com.fdoochann.employservice.controller;
 
 import com.fdoochann.employservice.Application;
+import com.fdoochann.employservice.model.Company;
+import com.fdoochann.employservice.model.Employee;
 import com.fdoochann.employservice.model.Person;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.EntityManager;
@@ -39,6 +42,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class PersonControllerTest
 {
 	private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
@@ -83,6 +87,17 @@ public class PersonControllerTest
 	}
 
 	@Test
+	public void getTest() throws Exception
+	{
+		mockMvc.perform(get("/persons/1"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.firstName", is("John")))
+				.andExpect(jsonPath("$.lastName", is("Doe")))
+				.andExpect(jsonPath("$.age", is(50)));
+	}
+
+	@Test
 	public void personNotFoundTest() throws Exception
 	{
 		mockMvc.perform(get("/persons/5")).andExpect(status().isNotFound());
@@ -117,12 +132,11 @@ public class PersonControllerTest
 	public void updatePerson() throws Exception
 	{
 		Person person = new Person();
-		person.setId(1L);
 		person.setAge(50);
 		person.setLastName("lastName");
 		person.setFirstName("firstName");
 
-		mockMvc.perform(post("/persons").content(this.json(person)).contentType(contentType))
+		mockMvc.perform(put("/persons/1").content(this.json(person)).contentType(contentType))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id", is(1)))
 				.andExpect(jsonPath("$.firstName", is("firstName")))
@@ -140,9 +154,24 @@ public class PersonControllerTest
 	}
 
 	@Test
+	public void updatePersonWithIncorrectId() throws Exception
+	{
+		Person person = new Person();
+		person.setAge(50);
+		person.setLastName("lastName");
+		person.setFirstName("firstName");
+
+		mockMvc.perform(put("/persons/5").content(this.json(person)).contentType(contentType))
+				.andExpect(status().isBadRequest());
+
+		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
+		assertEquals(2, persons.size());
+	}
+
+	@Test
 	public void deleteExistedPersonWithoutLinks() throws Exception
 	{
-		mockMvc.perform(delete("/persons/"+1)).andExpect(status().isOk());
+		mockMvc.perform(delete("/persons/1")).andExpect(status().isOk());
 
 		mockMvc.perform(get("/persons"))
 				.andExpect(status().isOk())
@@ -150,6 +179,31 @@ public class PersonControllerTest
 
 		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
 		assertEquals(1, persons.size());
+
+	}
+
+	@Test
+	public void deleteExistedPersonWithEmployeeLink() throws Exception
+	{
+		Person person = entityManager.getReference(Person.class, 1L);
+		Company company = entityManager.getReference(Company.class, 1L);
+		Employee employee = new Employee();
+		employee.setPerson(person);
+		employee.setCompany(company);
+		entityManager.persist(employee);
+
+		mockMvc.perform(delete("/persons/1")).andExpect(status().isOk());
+
+		mockMvc.perform(get("/persons"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(1)));
+
+		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
+		assertEquals("Persons", 1, persons.size());
+		List employees = entityManager.createQuery("SELECT p FROM Employee p").getResultList();
+		assertEquals("Employees", 0, employees.size());
+		List companies = entityManager.createQuery("SELECT p FROM Company p").getResultList();
+		assertEquals("Companies", 1, companies.size());
 
 	}
 

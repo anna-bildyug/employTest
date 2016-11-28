@@ -43,13 +43,13 @@ public class PersonController
 		return personRepository.save(person);
 	}
 
-	@RequestMapping(value = "/persons", method = RequestMethod.PUT)
-	public Person put(@RequestBody Person person)
+	@RequestMapping(value = "/persons/{id}", method = RequestMethod.PUT)
+	public Person put(@PathVariable long id, @RequestBody Person person)
 	{
-		Long id = person.getId();
-		if (id == null || !personRepository.exists(id))
+		person.setId(id);
+		if (!personRepository.exists(id))
 		{
-			throw new BadRequestException("Incorrect id for person "+id);
+			throw new BadRequestException("Incorrect id for person " + id);
 		}
 		return personRepository.save(person);
 	}

@@ -51,9 +51,21 @@ public class EmployeeController
 		return employeeTransformer.transform(storedEmployee);
 	}
 
+	@RequestMapping(value = "/employees/{id}", method = RequestMethod.PUT)
+	public EmployeeBindingModel put(@PathVariable("id") long id, @RequestBody EmployeeBindingModel employee)
+	{
+		employee.setId(id);
+		Employee model = employeeTransformer.transform(employee);
+		employeeValidator.validate(model);
+		Employee storedModel = employeeRepository.save(model);
+		EmployeeBindingModel bindingModel = employeeTransformer.transform(storedModel);
+		return bindingModel;
+	}
+
 	@RequestMapping(value = "/employees", method = RequestMethod.POST)
 	public EmployeeBindingModel post(@RequestBody EmployeeBindingModel employee)
 	{
+
 		Employee model = employeeTransformer.transform(employee);
 		employeeValidator.validate(model);
 		Employee storedModel = employeeRepository.save(model);
@@ -64,6 +76,13 @@ public class EmployeeController
 	@RequestMapping(value = "/employees/{id}", method = RequestMethod.DELETE)
 	public void delete(@PathVariable long id)
 	{
-		employeeRepository.delete(id);
+		if (employeeRepository.exists(id))
+		{
+			employeeRepository.delete(id);
+		}
+		else
+		{
+			throw new ResourceNotFoundException(id);
+		}
 	}
 }

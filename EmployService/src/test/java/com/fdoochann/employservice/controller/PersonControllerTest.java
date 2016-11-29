@@ -162,7 +162,7 @@ public class PersonControllerTest
 		person.setFirstName("firstName");
 
 		mockMvc.perform(put("/persons/5").content(this.json(person)).contentType(contentType))
-				.andExpect(status().isBadRequest());
+				.andExpect(status().isNotFound());
 
 		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
 		assertEquals(2, persons.size());
@@ -172,10 +172,6 @@ public class PersonControllerTest
 	public void deleteExistedPersonWithoutLinks() throws Exception
 	{
 		mockMvc.perform(delete("/persons/1")).andExpect(status().isOk());
-
-		mockMvc.perform(get("/persons"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$", hasSize(1)));
 
 		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
 		assertEquals(1, persons.size());
@@ -194,12 +190,22 @@ public class PersonControllerTest
 
 		mockMvc.perform(delete("/persons/1")).andExpect(status().isOk());
 
-		mockMvc.perform(get("/persons"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$", hasSize(1)));
-
 		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
 		assertEquals("Persons", 1, persons.size());
+		List employees = entityManager.createQuery("SELECT p FROM Employee p").getResultList();
+		assertEquals("Employees", 0, employees.size());
+		List companies = entityManager.createQuery("SELECT p FROM Company p").getResultList();
+		assertEquals("Companies", 1, companies.size());
+
+	}
+
+	@Test
+	public void deleteNotExistedPerson() throws Exception
+	{
+		mockMvc.perform(delete("/persons/15")).andExpect(status().isNotFound());
+
+		List persons = entityManager.createQuery("SELECT p FROM Person p").getResultList();
+		assertEquals("Persons", 2, persons.size());
 		List employees = entityManager.createQuery("SELECT p FROM Employee p").getResultList();
 		assertEquals("Employees", 0, employees.size());
 		List companies = entityManager.createQuery("SELECT p FROM Company p").getResultList();

@@ -1,6 +1,8 @@
 package com.fdoochann.employservice.controller;
 
 import com.fdoochann.employservice.Application;
+import com.fdoochann.employservice.model.Company;
+import com.fdoochann.employservice.model.Employee;
 import com.fdoochann.employservice.model.Person;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +17,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.EntityManager;
@@ -39,6 +42,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 public class EmployeeControllerTest
 {
 	private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
@@ -57,6 +61,9 @@ public class EmployeeControllerTest
 		assertNotNull("the JSON message converter must not be null", this.mappingJackson2HttpMessageConverter);
 	}
 
+	@PersistenceContext
+	private EntityManager entityManager;
+
 	@Before
 	public void setup() throws Exception
 	{
@@ -66,12 +73,19 @@ public class EmployeeControllerTest
 	@Test
 	public void getAllTest() throws Exception
 	{
+		Person person = entityManager.getReference(Person.class, 1L);
+		Company company = entityManager.getReference(Company.class, 1L);
+		Employee employee = new Employee();
+		employee.setPerson(person);
+		employee.setCompany(company);
+		entityManager.persist(employee);
+
 		mockMvc.perform(get("/employees"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(1)))
 				.andExpect(jsonPath("$[0].id", is(1)))
-				.andExpect(jsonPath("$[0].person.id", is(1)))
-				.andExpect(jsonPath("$[0].company.id", is(0)));
+				.andExpect(jsonPath("$[0].personId", is(1)))
+				.andExpect(jsonPath("$[0].companyId", is(1)));
 	}
 
 	@Test

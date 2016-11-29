@@ -1,7 +1,9 @@
 package com.fdoochann.employservice.controller;
 
+import com.fdoochann.employservice.exceptions.BadRequestException;
 import com.fdoochann.employservice.exceptions.ResourceNotFoundException;
 import com.fdoochann.employservice.model.Company;
+import com.fdoochann.employservice.model.Person;
 import com.fdoochann.employservice.repository.CompanyRepository;
 import org.apache.commons.collections4.IteratorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +41,31 @@ public class CompanyController
 	@RequestMapping(value = "/companies", method = RequestMethod.POST)
 	public Company post(@RequestBody Company company)
 	{
+		company.setId(null);
+		return companyRepository.save(company);
+	}
+
+	@RequestMapping(value = "/companies/{id}", method = RequestMethod.PUT)
+	public Company put(@PathVariable long id, @RequestBody Company company)
+	{
+		company.setId(id);
+		if (!companyRepository.exists(id))
+		{
+			throw new ResourceNotFoundException(id);
+		}
 		return companyRepository.save(company);
 	}
 
 	@RequestMapping(value = "/companies/{id}", method = RequestMethod.DELETE)
 	public void delete(@PathVariable long id)
 	{
-		companyRepository.delete(id);
+		if (companyRepository.exists(id))
+		{
+			companyRepository.delete(id);
+		}
+		else
+		{
+			throw new ResourceNotFoundException(id);
+		}
 	}
 }

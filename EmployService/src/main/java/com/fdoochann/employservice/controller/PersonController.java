@@ -49,7 +49,7 @@ public class PersonController
 		person.setId(id);
 		if (!personRepository.exists(id))
 		{
-			throw new BadRequestException("Incorrect id for person " + id);
+			throw new ResourceNotFoundException(id);
 		}
 		return personRepository.save(person);
 	}
@@ -57,7 +57,15 @@ public class PersonController
 	@RequestMapping(value = "/persons/{id}", method = RequestMethod.DELETE)
 	public void delete(@PathVariable long id)
 	{
-		personRepository.delete(id);
+		if (personRepository.exists(id))
+		{
+			personRepository.delete(id);
+		}
+		else
+		{
+			throw new ResourceNotFoundException(id);
+		}
+
 	}
 
 }

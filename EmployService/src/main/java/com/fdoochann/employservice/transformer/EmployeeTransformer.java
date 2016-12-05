@@ -24,18 +24,15 @@ public class EmployeeTransformer
 
 	public Employee transform(EmployeeBindingModel bindingModel)
 	{
-		//TODO move validation logic to validator
 		Employee model = new Employee();
 		model.setId(bindingModel.getId());
 
 		Long companyId = bindingModel.getCompanyId();
-//		Company company = companyRepository.findOne(companyId);
 		Company company = new Company();
 		company.setId(companyId);
 		model.setCompany(company);
 
 		Long personId = bindingModel.getPersonId();
-//		Person person = personRepository.findOne(personId);
 		Person person = new Person();
 		person.setId(personId);
 		model.setPerson(person);

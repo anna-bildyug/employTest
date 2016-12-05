@@ -1,6 +1,7 @@
 package com.fdoochann.employservice.controller;
 
 import com.fdoochann.employservice.Application;
+import com.fdoochann.employservice.bindingmodel.EmployeeBindingModel;
 import com.fdoochann.employservice.model.Company;
 import com.fdoochann.employservice.model.Employee;
 import com.fdoochann.employservice.model.Person;
@@ -25,9 +26,11 @@ import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -95,14 +98,63 @@ public class EmployeeControllerTest
 	}
 
 	@Test
-	public void addEmployee() throws Exception
+	public void getEmployee() throws Exception
 	{
+		Person person = entityManager.getReference(Person.class, 1L);
+		Company company = entityManager.getReference(Company.class, 1L);
+		Employee employee = new Employee();
+		employee.setPerson(person);
+		employee.setCompany(company);
+		entityManager.persist(employee);
+		mockMvc.perform(get("/employees/1")).andExpect(status().isOk());
+	}
 
+	@Test
+	public void addCorrectEmployee() throws Exception
+	{
+		EmployeeBindingModel model = new EmployeeBindingModel();
+		model.setPersonId(1L);
+		model.setCompanyId(1L);
+		mockMvc.perform(post("/employees").content(this.json(model)).contentType(contentType)).andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.personId", is(1)))
+				.andExpect(jsonPath("$.companyId", is(1)));
+		List employees = entityManager.createQuery("SELECT e FROM Employee e").getResultList();
+		assertEquals(1, employees.size());
+	}
+
+	@Test
+	public void addEmployeeWithIncorrectCompany() throws Exception
+	{
+		EmployeeBindingModel model = new EmployeeBindingModel();
+		model.setPersonId(1L);
+		model.setCompanyId(2L);
+		mockMvc.perform(post("/employees").content(this.json(model)).contentType(contentType)).andExpect(status().isBadRequest());
+		List employees = entityManager.createQuery("SELECT e FROM Employee e").getResultList();
+		assertEquals(0, employees.size());
+	}
+
+	@Test
+	public void addEmployeeWithIncorrectPerson() throws Exception
+	{
+		EmployeeBindingModel model = new EmployeeBindingModel();
+		model.setPersonId(3L);
+		model.setCompanyId(1L);
+		mockMvc.perform(post("/employees").content(this.json(model)).contentType(contentType)).andExpect(status().isBadRequest());
+		List employees = entityManager.createQuery("SELECT e FROM Employee e").getResultList();
+		assertEquals(0, employees.size());
 	}
 
 	@Test
 	public void updateEmployee() throws Exception
 	{
+		Person person = entityManager.getReference(Person.class, 1L);
+		Company company = entityManager.getReference(Company.class, 1L);
+		Employee employee = new Employee();
+		employee.setPerson(person);
+		employee.setCompany(company);
+		entityManager.persist(employee);
+
 
 	}
 

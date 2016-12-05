@@ -30,7 +30,7 @@ public class EmployeeController
 	{
 		Iterable<Employee> storedEmployees = employeeRepository.findAll();
 
-		List<EmployeeBindingModel>  employees = new ArrayList<>();
+		List<EmployeeBindingModel> employees = new ArrayList<>();
 		storedEmployees.forEach(employee ->
 		{
 			employees.add(employeeTransformer.transform(employee));
@@ -54,23 +54,26 @@ public class EmployeeController
 	@RequestMapping(value = "/employees/{id}", method = RequestMethod.PUT)
 	public EmployeeBindingModel put(@PathVariable("id") long id, @RequestBody EmployeeBindingModel employee)
 	{
-		employee.setId(id);
-		Employee model = employeeTransformer.transform(employee);
-		employeeValidator.validate(model);
-		Employee storedModel = employeeRepository.save(model);
-		EmployeeBindingModel bindingModel = employeeTransformer.transform(storedModel);
-		return bindingModel;
+		if (employeeRepository.exists(id))
+		{
+			employee.setId(id);
+			employeeValidator.validate(employee);
+			Employee storedModel = employeeRepository.save(employeeTransformer.transform(employee));
+			return employeeTransformer.transform(storedModel);
+		}
+		else
+		{
+			throw new ResourceNotFoundException(id);
+		}
 	}
 
 	@RequestMapping(value = "/employees", method = RequestMethod.POST)
 	public EmployeeBindingModel post(@RequestBody EmployeeBindingModel employee)
 	{
-
-		Employee model = employeeTransformer.transform(employee);
-		employeeValidator.validate(model);
-		Employee storedModel = employeeRepository.save(model);
-		EmployeeBindingModel bindingModel = employeeTransformer.transform(storedModel);
-		return bindingModel;
+		employee.setId(null);
+		employeeValidator.validate(employee);
+		Employee storedModel = employeeRepository.save(employeeTransformer.transform(employee));
+		return employeeTransformer.transform(storedModel);
 	}
 
 	@RequestMapping(value = "/employees/{id}", method = RequestMethod.DELETE)

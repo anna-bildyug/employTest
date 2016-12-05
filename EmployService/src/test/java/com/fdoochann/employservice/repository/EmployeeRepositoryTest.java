@@ -4,10 +4,8 @@ import com.fdoochann.employservice.Application;
 import com.fdoochann.employservice.model.Company;
 import com.fdoochann.employservice.model.Employee;
 import com.fdoochann.employservice.model.Person;
-import org.hibernate.Session;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.omg.CORBA.PERSIST_STORE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -16,9 +14,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Администратор on 27.11.2016.
